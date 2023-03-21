@@ -1,0 +1,17 @@
+logger:
+  logLevel: DEBUG
+  logFileEnable: true
+  logStdoutEnable: true
+  logFile: ./out.log
+  maxSize: 500
+  maxAge: 28
+  maxBackups: 7
+  rewriteLog: true
+database:
+  port: 5432
+  host: localhost
+  user: postgres
+  password: password
+  dbName: firstbd
+  tableName: my_table
+  driver: postgres
