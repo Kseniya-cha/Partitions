@@ -96,37 +96,40 @@ func main() {
 
 	ctx, _ := context.WithCancel(context.Background())
 
+	tick := time.NewTicker(10 * time.Minute)
+
 	for {
+		select {
+		case <-tick.C:
 
-		t := time.Now()
-		// start, end := getPeriodDays(t, 1)
-		start, end := getPeriod2Hour(t)
-		fmt.Println(start, end)
+			t := time.Now()
+			// start, end := getPeriodDays(t, 1)
+			start, end := getPeriod2Hour(t)
+			fmt.Println(start, end)
 
-		partitionName := getPartitionName(tableName, start, end, true)
-		fmt.Println(partitionName)
+			partitionName := getPartitionName(tableName, start, end, true)
+			fmt.Println(partitionName)
 
-		_, err := db.Conn.Query(ctx, fmt.Sprintf(`SELECT * FROM %s`, partitionName))
+			_, err := db.Conn.Query(ctx, fmt.Sprintf(`SELECT * FROM %s`, partitionName))
 
-		time.Sleep(5 * time.Second)
+			if err != nil {
+				_, err = db.Conn.Exec(ctx, fmt.Sprintf(`
+				CREATE TABLE %s PARTITION OF %s
+				FOR VALUES FROM ('%s') TO ('%s')
+			`, partitionName, tableName, start, end))
+				if err != nil {
+					fmt.Println("cannot create partition table:", err)
+					continue
+				}
+			}
 
-		if err != nil {
-			// _, err = db.Conn.Exec(ctx, fmt.Sprintf(`
-			// 	CREATE TABLE %s PARTITION OF %s
-			// 	FOR VALUES FROM ('%s') TO ('%s')
-			// `, partitionName, tableName, start, end))
-			// if err != nil {
-			// 	fmt.Println("cannot create partition table:", err)
-			// 	continue
-			// }
+			query := fmt.Sprintf("INSERT INTO %s (name, created_at) VALUES ('test', '%v')", tableName, covertTime(t))
+
+			smth, err := db.Conn.Exec(ctx, query)
+			fmt.Println(smth, err)
+			if err != nil {
+				fmt.Println("cannot insert:", err)
+			}
 		}
-
-		// query := fmt.Sprintf("INSERT INTO %s (name, created_at) VALUES ('test', '%v')", tableName, covertTime(t))
-
-		// smth, err := db.Conn.Exec(ctx, query)
-		// fmt.Println(smth, err)
-		// if err != nil {
-		// 	fmt.Println("cannot insert:", err)
-		// }
 	}
 }
