@@ -9,7 +9,7 @@ import (
 func (a *app) Run(ctx context.Context) {
 
 	// раз в какое время будем пытаться вставить строки
-	tick := time.NewTicker(10 * time.Minute)
+	tick := time.NewTicker(1 * time.Minute)
 
 	for {
 		<-tick.C
@@ -23,9 +23,11 @@ func (a *app) Run(ctx context.Context) {
 
 		// имя партиции
 		partitionName := getPartitionName(a.cfg.TableName, start, end, true)
+		fmt.Println(partitionName)
 
 		// проверка, что партиция существует
 		_, err := a.db.GetConn().Query(ctx, fmt.Sprintf(`SELECT * FROM %s`, partitionName))
+		fmt.Println(err)
 
 		// если партиции не существует, она создаётся
 		if err != nil {
@@ -38,9 +40,11 @@ func (a *app) Run(ctx context.Context) {
 				continue
 			}
 		}
+		fmt.Println(partitionName, "is created")
 
 		// формирование запроса
 		query := fmt.Sprintf("INSERT INTO %s (name, created_at) VALUES ('test', '%v')", a.cfg.TableName, covertTime(t))
+		fmt.Println(query)
 
 		// вставка строки
 		smth, err := a.db.GetConn().Exec(ctx, query)
