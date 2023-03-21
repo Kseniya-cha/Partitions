@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -42,11 +43,46 @@ func covertTime(t time.Time) string {
 	return strings.Join(tNow1[:len(tNow1)-1], ":")
 }
 
-func getStartEndTime(t time.Time) (string, string) {
-	start, end := covertTime(t), covertTime(t.AddDate(0, 0, 1))
+// принимает исходное время t, в которое необходимо запушить в бд
+// и число дней, на которое должен распространяться период партиции
+func getPeriodDays(t time.Time, period int) (string, string) {
+	start, end := covertTime(t), covertTime(t.AddDate(0, 0, period))
 
 	return strings.Split(start, " ")[0] + " 00:00:00+" + strings.Split(start, "+")[1],
 		strings.Split(end, " ")[0] + " 00:00:00+" + strings.Split(end, "+")[1]
+}
+
+// партиции раз в два часа, только чётные: с 00 до 02, с 12 до 14 etc
+func getPeriod2Hour(t time.Time) (string, string) {
+	start, end := covertTime(t), covertTime(t.Add(2*time.Hour))
+
+	timezone := strings.Split(start, "+")[1]
+
+	startHour := strings.Split(strings.Split(start, " ")[1], ":")[0]
+	endHour := strings.Split(strings.Split(end, " ")[1], ":")[0]
+
+	if i, _ := strconv.Atoi(startHour); i%2 != 0 {
+		startHourI, _ := strconv.Atoi(startHour)
+		startHour = strconv.Itoa(startHourI - 1)
+		endHourI, _ := strconv.Atoi(endHour)
+		endHour = strconv.Itoa(endHourI - 1)
+	}
+
+	return strings.Split(start, " ")[0] + " " + startHour + ":00:00+" + timezone,
+		strings.Split(end, " ")[0] + " " + endHour + ":00:00+" + timezone
+}
+
+func getPartitionName(tableName, start, end string, isHour bool) string {
+	partitionName := tableName + "_" + strings.Replace(strings.Split(start, " ")[0], "-", "_", -1)
+
+	if isHour {
+		hourStart := strings.Split(strings.Split(start, " ")[1], ":")
+		hourEnd := strings.Split(strings.Split(end, " ")[1], ":")
+		partitionName += "_from" + hourStart[0] + "to" + hourEnd[0]
+	}
+
+	return partitionName
+
 }
 
 func main() {
@@ -61,32 +97,36 @@ func main() {
 	ctx, _ := context.WithCancel(context.Background())
 
 	for {
-		time.Sleep(5 * time.Second)
 
 		t := time.Now()
-		start, end := getStartEndTime(t)
+		// start, end := getPeriodDays(t, 1)
+		start, end := getPeriod2Hour(t)
+		fmt.Println(start, end)
 
-		partitionName := tableName + "_" + strings.Replace(strings.Split(covertTime(t), " ")[0], "-", "_", -1)
+		partitionName := getPartitionName(tableName, start, end, true)
+		fmt.Println(partitionName)
 
 		_, err := db.Conn.Query(ctx, fmt.Sprintf(`SELECT * FROM %s`, partitionName))
 
+		time.Sleep(5 * time.Second)
+
 		if err != nil {
-			_, err = db.Conn.Exec(ctx, fmt.Sprintf(`
-				CREATE TABLE %s PARTITION OF %s
-				FOR VALUES FROM ('%s') TO ('%s')
-			`, partitionName, tableName, start, end))
-			if err != nil {
-				fmt.Println("cannot create partition table:", err)
-				continue
-			}
+			// _, err = db.Conn.Exec(ctx, fmt.Sprintf(`
+			// 	CREATE TABLE %s PARTITION OF %s
+			// 	FOR VALUES FROM ('%s') TO ('%s')
+			// `, partitionName, tableName, start, end))
+			// if err != nil {
+			// 	fmt.Println("cannot create partition table:", err)
+			// 	continue
+			// }
 		}
 
-		query := fmt.Sprintf("INSERT INTO %s (name, created_at) VALUES ('test', '%v')", tableName, covertTime(t))
+		// query := fmt.Sprintf("INSERT INTO %s (name, created_at) VALUES ('test', '%v')", tableName, covertTime(t))
 
-		smth, err := db.Conn.Exec(ctx, query)
-		fmt.Println(smth, err)
-		if err != nil {
-			fmt.Println("cannot insert:", err)
-		}
+		// smth, err := db.Conn.Exec(ctx, query)
+		// fmt.Println(smth, err)
+		// if err != nil {
+		// 	fmt.Println("cannot insert:", err)
+		// }
 	}
 }
