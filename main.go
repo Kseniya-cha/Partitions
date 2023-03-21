@@ -87,6 +87,7 @@ func getPartitionName(tableName, start, end string, isHour bool) string {
 func main() {
 	tableName := "my_table"
 
+	// коннект к бд
 	db, err := NewDB()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
@@ -95,21 +96,26 @@ func main() {
 
 	ctx, _ := context.WithCancel(context.Background())
 
+	// раз в какое время будем пытаться вставить строки
 	tick := time.NewTicker(10 * time.Minute)
 
 	for {
 		<-tick.C
 
+		// время получения сообщения
 		t := time.Now()
+
+		// start, end - начало и конец границ партиций
 		// start, end := getPeriodDays(t, 1)
 		start, end := getPeriod2Hour(t)
-		fmt.Println(start, end)
 
+		// имя партиции
 		partitionName := getPartitionName(tableName, start, end, true)
-		fmt.Println(partitionName)
 
+		// проверка, что партиция существует
 		_, err := db.Conn.Query(ctx, fmt.Sprintf(`SELECT * FROM %s`, partitionName))
 
+		// если партиции не существует, она создаётся
 		if err != nil {
 			_, err = db.Conn.Exec(ctx, fmt.Sprintf(`
 				CREATE TABLE %s PARTITION OF %s
@@ -121,8 +127,10 @@ func main() {
 			}
 		}
 
+		// формирование запроса
 		query := fmt.Sprintf("INSERT INTO %s (name, created_at) VALUES ('test', '%v')", tableName, covertTime(t))
 
+		// вставка строки
 		smth, err := db.Conn.Exec(ctx, query)
 		fmt.Println(smth, err)
 		if err != nil {
