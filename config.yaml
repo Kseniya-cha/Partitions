@@ -13,5 +13,5 @@ database:
   user: postgres
   password: password
   dbName: firstbd
-  tableName: my_table
+  tableName: device_testing_results
   driver: postgres
