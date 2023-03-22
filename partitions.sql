@@ -1,9 +1,18 @@
-CREATE IF NOT EXISTS TABLE my_table (
-    id SERIAL,
-    name VARCHAR(50),
-    created_at TIMESTAMP WITH TIME ZONE 
-) PARTITION BY RANGE (created_at);
+CREATE TABLE "monitoring_cycles" (
+  id bigserial PRIMARY KEY,
+  start_datetime timestamp NOT NULL DEFAULT (now()),
+  end_datetime timestamp
+);
 
-CREATE INDEX my_table_idx ON my_table (created_at);
+CREATE TABLE "device_testing_results" (
+  id bigserial,
+  cycles_id int NOT NULL,
+  start_datetime timestamp NOT NULL DEFAULT (now()),
+	PRIMARY KEY (id, start_datetime)
+) PARTITION BY RANGE (start_datetime);
 
-CREATE TABLE my_table_def PARTITION OF my_table DEFAULT;
+CREATE INDEX ON monitoring_cycles (start_datetime);
+
+CREATE INDEX ON device_testing_results (cycles_id);
+
+ALTER TABLE device_testing_results ADD FOREIGN KEY (cycles_id) REFERENCES monitoring_cycles (id);

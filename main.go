@@ -36,7 +36,7 @@ func NewDB() (db *DB, err error) {
 	return &DB{pool}, nil
 }
 
-func covertTime(t time.Time) string {
+func convertTime(t time.Time) string {
 	tNow := strings.Join(strings.Split(t.Format(time.RFC3339), "T"), " ")
 	tNow1 := strings.Split(tNow, ":")
 
@@ -46,17 +46,18 @@ func covertTime(t time.Time) string {
 // принимает исходное время t, в которое необходимо запушить в бд
 // и число дней, на которое должен распространяться период партиции
 func getPeriodDays(t time.Time, period int) (string, string) {
-	start, end := covertTime(t), covertTime(t.AddDate(0, 0, period))
+	start, end := convertTime(t), convertTime(t.AddDate(0, 0, period))
 
-	return strings.Split(start, " ")[0] + " 00:00:00+" + strings.Split(start, "+")[1],
-		strings.Split(end, " ")[0] + " 00:00:00+" + strings.Split(end, "+")[1]
+	return strings.Split(start, " ")[0] + " 00:00:00",
+		strings.Split(end, " ")[0] + " 00:00:00"
 }
 
 // партиции раз в два часа, только чётные: с 00 до 02, с 12 до 14 etc
 func getPeriod2Hour(t time.Time) (string, string) {
-	start, end := covertTime(t), covertTime(t.Add(2*time.Hour))
+	start, end := convertTime(t), convertTime(t.Add(2*time.Hour))
 
-	timezone := strings.Split(start, "+")[1]
+	fmt.Println(start)
+	fmt.Println(strings.Split(start, " ")[0] + " 00:00:00")
 
 	startHour := strings.Split(strings.Split(start, " ")[1], ":")[0]
 	endHour := strings.Split(strings.Split(end, " ")[1], ":")[0]
@@ -68,8 +69,8 @@ func getPeriod2Hour(t time.Time) (string, string) {
 		endHour = strconv.Itoa(endHourI - 1)
 	}
 
-	return strings.Split(start, " ")[0] + " " + startHour + ":00:00+" + timezone,
-		strings.Split(end, " ")[0] + " " + endHour + ":00:00+" + timezone
+	return strings.Split(start, " ")[0] + " " + startHour + ":00:00",
+		strings.Split(end, " ")[0] + " " + endHour + ":00:00"
 }
 
 func getPartitionName(tableName, start, end string, isHour bool) string {
@@ -85,7 +86,7 @@ func getPartitionName(tableName, start, end string, isHour bool) string {
 }
 
 func main() {
-	tableName := "my_table"
+	tableName := "device_testing_results"
 
 	// коннект к бд
 	db, err := NewDB()
@@ -96,8 +97,14 @@ func main() {
 
 	ctx, _ := context.WithCancel(context.Background())
 
+	query := fmt.Sprintf("INSERT INTO monitoring_cycles (start_datetime,end_datetime) VALUES (now(), now() + interval '1 second')")
+
+	time.Sleep(time.Second)
+	// вставка строки
+	_, err = db.Conn.Exec(ctx, query)
+
 	// раз в какое время будем пытаться вставить строки
-	tick := time.NewTicker(10 * time.Minute)
+	tick := time.NewTicker(5 * time.Second)
 
 	for {
 		<-tick.C
@@ -106,11 +113,11 @@ func main() {
 		t := time.Now()
 
 		// start, end - начало и конец границ партиций
-		// start, end := getPeriodDays(t, 1)
-		start, end := getPeriod2Hour(t)
+		start, end := getPeriodDays(t, 1)
+		// start, end := getPeriod2Hour(t)
 
 		// имя партиции
-		partitionName := getPartitionName(tableName, start, end, true)
+		partitionName := getPartitionName(tableName, start, end, false)
 
 		// проверка, что партиция существует
 		_, err := db.Conn.Query(ctx, fmt.Sprintf(`SELECT * FROM %s`, partitionName))
@@ -128,7 +135,7 @@ func main() {
 		}
 
 		// формирование запроса
-		query := fmt.Sprintf("INSERT INTO %s (name, created_at) VALUES ('test', '%v')", tableName, covertTime(t))
+		query := fmt.Sprintf("INSERT INTO %s (cycles_id) VALUES ('1')", tableName)
 
 		// вставка строки
 		smth, err := db.Conn.Exec(ctx, query)
@@ -136,5 +143,6 @@ func main() {
 		if err != nil {
 			fmt.Println("cannot insert:", err)
 		}
+
 	}
 }
