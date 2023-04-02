@@ -13,5 +13,6 @@ database:
   user: postgres
   password: password
   dbName: firstbd
-  tableName: device_testing_results
+  tableNameGlobal: monitoring_cycles
+  tableNameResult: device_testing_results
   driver: postgres

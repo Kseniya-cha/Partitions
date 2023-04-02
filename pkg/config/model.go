@@ -20,11 +20,12 @@ type Logger struct {
 
 // Database содержит параметры базы данных
 type Database struct {
-	Port      int    `mapstructure:"port"`
-	Host      string `mapstructure:"host"`
-	User      string `mapstructure:"user"`
-	Password  string `mapstructure:"password"`
-	DbName    string `mapstructure:"dbName"`
-	TableName string `mapstructure:"tableName"`
-	Driver    string `mapstructure:"driver"`
+	Port            int    `mapstructure:"port"`
+	Host            string `mapstructure:"host"`
+	User            string `mapstructure:"user"`
+	Password        string `mapstructure:"password"`
+	DbName          string `mapstructure:"dbName"`
+	TableNameGlobal string `mapstructure:"tableNameGlobal"`
+	TableNameResult string `mapstructure:"tableNameResult"`
+	Driver          string `mapstructure:"driver"`
 }

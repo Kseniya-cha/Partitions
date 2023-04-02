@@ -4,6 +4,10 @@ import (
 	"context"
 	"os"
 
+	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/internal/devicetestingresults"
+	repoRes "github.com/Kseniya-cha/LEARN_GOLANG/partitions/internal/devicetestingresults/repository"
+	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/internal/monitoringcycle"
+	repoGlob "github.com/Kseniya-cha/LEARN_GOLANG/partitions/internal/monitoringcycle/repository"
 	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/pkg/config"
 	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/pkg/database/postgresql"
 	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/pkg/logger"
@@ -22,6 +26,9 @@ type app struct {
 	db  postgresql.IDB
 
 	sigChan chan os.Signal
+
+	repoGlobal monitoringcycle.Repository
+	repoResult devicetestingresults.Repository
 }
 
 // NewApp инициализирует прототип приложения
@@ -45,5 +52,8 @@ func NewApp(ctx context.Context, cfg *config.Config) (App, error) {
 		log: log,
 
 		sigChan: sigChan,
+
+		repoResult: repoRes.NewRepository(db, log),
+		repoGlobal: repoGlob.NewRepository(db, log),
 	}, nil
 }

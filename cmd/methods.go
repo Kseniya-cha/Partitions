@@ -28,6 +28,7 @@ func (a *app) GracefulShutdown(cancel context.CancelFunc) {
 	a.log.Debug("Waiting...")
 }
 
+// convertTime преобразует время в строку
 func convertTime(t time.Time) string {
 	tNow := strings.Join(strings.Split(t.Format(time.RFC3339), "T"), " ")
 	tNow1 := strings.Split(tNow, ":")
