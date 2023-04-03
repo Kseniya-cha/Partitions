@@ -35,7 +35,11 @@ func (r *repository) IsPartitionExist(ctx context.Context, partitionName string)
 
 	r.log.Debug(fmt.Sprintf("SQL query:\n%s", query))
 
-	if _, err := r.db.GetConn().Query(ctx, query); err != nil {
+	tx, _ := r.db.GetConn().Begin(ctx)
+	defer tx.Rollback(ctx)
+	defer tx.Commit(ctx)
+
+	if _, err := tx.Query(ctx, query); err != nil {
 		return err
 	}
 
@@ -55,7 +59,11 @@ func (r *repository) CreatePartition(ctx context.Context, partitionName, tableNa
 
 	r.log.Debug(fmt.Sprintf("SQL query:\n%s", query))
 
-	if _, err := r.db.GetConn().Exec(ctx, query); err != nil {
+	tx, _ := r.db.GetConn().Begin(ctx)
+	defer tx.Rollback(ctx)
+	defer tx.Commit(ctx)
+
+	if _, err := tx.Exec(ctx, query); err != nil {
 		return fmt.Errorf("cannot create partition: %v", err)
 	}
 
@@ -72,7 +80,11 @@ func (r *repository) Insert(ctx context.Context, tableName string, val devicetes
 
 	r.log.Debug(fmt.Sprintf("SQL query:\n%s", query))
 
-	if _, err := r.db.GetConn().Exec(ctx, query); err != nil {
+	tx, _ := r.db.GetConn().Begin(ctx)
+	defer tx.Rollback(ctx)
+	defer tx.Commit(ctx)
+
+	if _, err := tx.Exec(ctx, query); err != nil {
 		return err
 	}
 

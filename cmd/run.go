@@ -15,6 +15,14 @@ func (a *app) Run(ctx context.Context) {
 	for {
 		<-tick.C
 
+		if ctx.Err() != nil {
+			return
+		}
+
+		if !a.db.IsConn(ctx) {
+			return
+		}
+
 		// время получения сообщения
 		t := time.Now()
 

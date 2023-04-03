@@ -32,7 +32,11 @@ func (r *repository) InsertGlobal(ctx context.Context, tableName string) error {
 
 	r.log.Debug(fmt.Sprintf("SQL query:\n%s", query))
 
-	if _, err := r.db.GetConn().Exec(ctx, query); err != nil {
+	tx, _ := r.db.GetConn().Begin(ctx)
+	defer tx.Rollback(ctx)
+	defer tx.Commit(ctx)
+
+	if _, err := tx.Exec(ctx, query); err != nil {
 		return err
 	}
 
@@ -50,7 +54,11 @@ func (r *repository) GetNewGlobalCycle(ctx context.Context, tableName string) (i
 
 	r.log.Debug(fmt.Sprintf("SQL query:\n%s", query))
 
-	rows, err := r.db.GetConn().Query(ctx, query)
+	tx, _ := r.db.GetConn().Begin(ctx)
+	defer tx.Rollback(ctx)
+	defer tx.Commit(ctx)
+
+	rows, err := tx.Query(ctx, query)
 	if err != nil {
 		return 0, err
 	}
@@ -76,7 +84,11 @@ func (r *repository) Update(ctx context.Context, tableName string, id int) error
 
 	r.log.Debug(fmt.Sprintf("SQL query:\n%s", query))
 
-	if _, err := r.db.GetConn().Exec(ctx, query); err != nil {
+	tx, _ := r.db.GetConn().Begin(ctx)
+	defer tx.Rollback(ctx)
+	defer tx.Commit(ctx)
+
+	if _, err := tx.Exec(ctx, query); err != nil {
 		return err
 	}
 
