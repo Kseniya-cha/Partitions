@@ -57,7 +57,7 @@ func (a *app) Run(ctx context.Context) {
 			continue
 		}
 
-		obj := devicetestingresults.DeviceTestingResults{CycleId: id, StartDatetime: start}
+		obj := devicetestingresults.DeviceTestingResults{CycleId: id, StartDatetime: convertTime(time.Now())}
 
 		// вставка строки в таблицу с результатами
 		err = a.repoResult.Insert(ctx, a.cfg.TableNameResult, obj)
