@@ -24,22 +24,6 @@ func NewRepository(db postgresql.IDB, log *zap.Logger) *repository {
 	}
 }
 
-func (r *repository) getInsertQuery(objs []devicetestingresults.DeviceTestingResults,
-	tableNameResult string) string {
-
-	val := strings.Builder{}
-
-	if len(objs) == 0 {
-		return ""
-	}
-
-	for _, obj := range objs {
-		val.WriteString(fmt.Sprintf("('%d', '%s'), ", obj.CycleId, obj.StartDatetime))
-	}
-
-	return fmt.Sprintf(devicetestingresults.Insert, tableNameResult, val.String()[:val.Len()-2])
-}
-
 // IsPartitionExist делает select-запрос к бд и проверяет,
 // существует ли партиция с переданным именем
 func (r *repository) IsPartitionExist(ctx context.Context, partitionName string) error {
@@ -106,4 +90,20 @@ func (r *repository) Insert(ctx context.Context, tableNameResult string, objs []
 	}
 
 	return nil
+}
+
+func (r *repository) getInsertQuery(objs []devicetestingresults.DeviceTestingResults,
+	tableNameResult string) string {
+
+	val := strings.Builder{}
+
+	if len(objs) == 0 {
+		return ""
+	}
+
+	for _, obj := range objs {
+		val.WriteString(fmt.Sprintf("('%d', '%d', '%s'), ", obj.CycleId, obj.Uuid, obj.StartDatetime))
+	}
+
+	return fmt.Sprintf(devicetestingresults.Insert, tableNameResult, val.String()[:val.Len()-2])
 }

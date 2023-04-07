@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"math/rand"
 	"time"
 
 	"github.com/Kseniya-cha/Partitions/internal/devicetestingresults"
@@ -59,7 +60,9 @@ func (a *app) Run(ctx context.Context) {
 
 		// объекты, которые необходимо вставить за данный цикл
 		objs := []devicetestingresults.DeviceTestingResults{
-			{CycleId: id, StartDatetime: convertTime(time.Now())},
+			{CycleId: id, StartDatetime: convertTime(time.Now()), Uuid: rand.Intn(1000)},
+			{CycleId: id, StartDatetime: convertTime(time.Now()), Uuid: rand.Intn(1000)},
+			{CycleId: id, StartDatetime: convertTime(time.Now()), Uuid: rand.Intn(1000)},
 		}
 
 		// вставка строки в таблицу с результатами

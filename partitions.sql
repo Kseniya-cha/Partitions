@@ -7,6 +7,7 @@ CREATE TABLE "monitoring_cycles" (
 CREATE TABLE "device_testing_results" (
   id bigserial,
   cycles_id int NOT NULL,
+  uuid int NOT NULL,
   start_datetime timestamp NOT NULL DEFAULT (now()),
 	PRIMARY KEY (id, start_datetime)
 ) PARTITION BY RANGE (start_datetime);
