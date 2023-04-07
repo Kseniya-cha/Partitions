@@ -4,12 +4,13 @@ import (
 	"context"
 	"os"
 
-	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/internal/devicetestingresults"
-	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/internal/monitoringcycle"
-	repoGlob "github.com/Kseniya-cha/LEARN_GOLANG/partitions/internal/monitoringcycle/repository"
-	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/pkg/config"
-	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/pkg/database/postgresql"
-	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/pkg/logger"
+	"github.com/Kseniya-cha/Partitions/internal/devicetestingresults"
+	repoRes "github.com/Kseniya-cha/Partitions/internal/devicetestingresults/repository"
+	"github.com/Kseniya-cha/Partitions/internal/monitoringcycle"
+	repoGlob "github.com/Kseniya-cha/Partitions/internal/monitoringcycle/repository"
+	"github.com/Kseniya-cha/Partitions/pkg/config"
+	"github.com/Kseniya-cha/Partitions/pkg/database/postgresql"
+	"github.com/Kseniya-cha/Partitions/pkg/logger"
 	"go.uber.org/zap"
 )
 

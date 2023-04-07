@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/pkg/config"
+	"github.com/Kseniya-cha/Partitions/pkg/config"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"

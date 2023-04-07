@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/pkg/config"
+	"github.com/Kseniya-cha/Partitions/pkg/config"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 )

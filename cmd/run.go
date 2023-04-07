@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/internal/devicetestingresults"
+	"github.com/Kseniya-cha/Partitions/internal/devicetestingresults"
 )
 
 func (a *app) Run(ctx context.Context) {

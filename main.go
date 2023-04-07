@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/cmd"
-	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/pkg/config"
-	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/pkg/logger"
+	"github.com/Kseniya-cha/Partitions/cmd"
+	"github.com/Kseniya-cha/Partitions/pkg/config"
+	"github.com/Kseniya-cha/Partitions/pkg/logger"
 )
 
 func main() {

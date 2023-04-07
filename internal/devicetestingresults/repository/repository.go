@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/internal/devicetestingresults"
-	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/pkg/database/postgresql"
+	"github.com/Kseniya-cha/Partitions/internal/devicetestingresults"
+	"github.com/Kseniya-cha/Partitions/pkg/database/postgresql"
 	"go.uber.org/zap"
 )
 
@@ -22,6 +22,22 @@ func NewRepository(db postgresql.IDB, log *zap.Logger) *repository {
 		db:  db,
 		log: log,
 	}
+}
+
+func (r *repository) getInsertQuery(objs []devicetestingresults.DeviceTestingResults,
+	tableNameResult string) string {
+
+	val := strings.Builder{}
+
+	if len(objs) == 0 {
+		return ""
+	}
+
+	for _, obj := range objs {
+		val.WriteString(fmt.Sprintf("('%d', '%s'), ", obj.CycleId, obj.StartDatetime))
+	}
+
+	return fmt.Sprintf(devicetestingresults.Insert, tableNameResult, val.String()[:val.Len()-2])
 }
 
 // IsPartitionExist делает select-запрос к бд и проверяет,
@@ -90,20 +106,4 @@ func (r *repository) Insert(ctx context.Context, tableNameResult string, objs []
 	}
 
 	return nil
-}
-
-func (r *repository) getInsertQuery(objs []devicetestingresults.DeviceTestingResults,
-	tableNameResult string) string {
-
-	val := strings.Builder{}
-
-	if len(objs) == 0 {
-		return ""
-	}
-
-	for _, obj := range objs {
-		val.WriteString(fmt.Sprintf("('%d', '%s'), ", obj.CycleId, obj.StartDatetime))
-	}
-
-	return fmt.Sprintf(devicetestingresults.Insert, tableNameResult, val.String()[:val.Len()-2])
 }

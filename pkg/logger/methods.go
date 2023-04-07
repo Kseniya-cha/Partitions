@@ -3,7 +3,7 @@ package logger
 import (
 	"io"
 
-	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/pkg/config"
+	"github.com/Kseniya-cha/Partitions/pkg/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )

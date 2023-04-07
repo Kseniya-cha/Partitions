@@ -1,4 +1,4 @@
-module github.com/Kseniya-cha/LEARN_GOLANG/partitions
+module github.com/Kseniya-cha/Partitions
 
 go 1.19
 

@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/internal/monitoringcycle"
-	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/pkg/database/postgresql"
+	"github.com/Kseniya-cha/Partitions/internal/monitoringcycle"
+	"github.com/Kseniya-cha/Partitions/pkg/database/postgresql"
 	"go.uber.org/zap"
 )
 
