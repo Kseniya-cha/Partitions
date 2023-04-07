@@ -57,10 +57,13 @@ func (a *app) Run(ctx context.Context) {
 			continue
 		}
 
-		obj := devicetestingresults.DeviceTestingResults{CycleId: id, StartDatetime: convertTime(time.Now())}
+		// объекты, которые необходимо вставить за данный цикл
+		objs := []devicetestingresults.DeviceTestingResults{
+			{CycleId: id, StartDatetime: convertTime(time.Now())},
+		}
 
 		// вставка строки в таблицу с результатами
-		err = a.repoResult.Insert(ctx, a.cfg.TableNameResult, obj)
+		err = a.repoResult.Insert(ctx, a.cfg.TableNameResult, objs)
 		if err != nil {
 			a.log.Error(err.Error())
 			continue

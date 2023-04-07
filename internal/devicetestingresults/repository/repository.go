@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/internal/devicetestingresults"
 	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/pkg/database/postgresql"
@@ -70,9 +71,9 @@ func (r *repository) CreatePartition(ctx context.Context, partitionName, tableNa
 	return nil
 }
 
-func (r *repository) Insert(ctx context.Context, tableName string, val devicetestingresults.DeviceTestingResults) error {
+func (r *repository) Insert(ctx context.Context, tableNameResult string, objs []devicetestingresults.DeviceTestingResults) error {
 
-	query := fmt.Sprintf(devicetestingresults.Insert, tableName, val.CycleId, val.StartDatetime)
+	query := r.getInsertQuery(objs, tableNameResult)
 
 	if ctx.Err() != nil {
 		return ctx.Err()
@@ -89,4 +90,20 @@ func (r *repository) Insert(ctx context.Context, tableName string, val devicetes
 	}
 
 	return nil
+}
+
+func (r *repository) getInsertQuery(objs []devicetestingresults.DeviceTestingResults,
+	tableNameResult string) string {
+
+	val := strings.Builder{}
+
+	if len(objs) == 0 {
+		return ""
+	}
+
+	for _, obj := range objs {
+		val.WriteString(fmt.Sprintf("('%d', '%s'), ", obj.CycleId, obj.StartDatetime))
+	}
+
+	return fmt.Sprintf(devicetestingresults.Insert, tableNameResult, val.String()[:val.Len()-2])
 }

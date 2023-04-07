@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/internal/devicetestingresults"
-	repoRes "github.com/Kseniya-cha/LEARN_GOLANG/partitions/internal/devicetestingresults/repository"
 	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/internal/monitoringcycle"
 	repoGlob "github.com/Kseniya-cha/LEARN_GOLANG/partitions/internal/monitoringcycle/repository"
 	"github.com/Kseniya-cha/LEARN_GOLANG/partitions/pkg/config"
@@ -53,6 +52,7 @@ func NewApp(ctx context.Context, cfg *config.Config) (App, error) {
 
 		sigChan: sigChan,
 
+		// repoResult: repos,
 		repoResult: repoRes.NewRepository(db, log),
 		repoGlobal: repoGlob.NewRepository(db, log),
 	}, nil
