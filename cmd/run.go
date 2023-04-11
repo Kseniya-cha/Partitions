@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Kseniya-cha/Partitions/internal/devicetestingresults"
+	"github.com/Kseniya-cha/Partitions/pkg/methods"
 )
 
 func (a *app) Run(ctx context.Context) {
@@ -24,32 +25,29 @@ func (a *app) Run(ctx context.Context) {
 			return
 		}
 
-		// время получения сообщения
-		t := time.Now()
-
 		err := a.repoGlobal.InsertGlobal(ctx, a.cfg.TableNameGlobal)
 		if err != nil {
 			a.log.Error(err.Error())
 			continue
 		}
 
-		// start, end - начало и конец границ партиций
-		start, end := getPeriodDays(t, 1)
+		// // start, end - начало и конец границ партиций
+		// start, end := getPeriodDays(t, 1)
 
-		// имя партиции
-		partitionName := getPartitionName(a.cfg.TableNameResult, start, end, false)
+		// // имя партиции
+		// partitionName := getPartitionName(a.cfg.TableNameResult, start, end, false)
 
-		// проверка, что партиция существует
-		err = a.repoResult.IsPartitionExist(ctx, partitionName)
+		// // проверка, что партиция существует
+		// err = a.repoResult.IsPartitionExist(ctx, partitionName)
 
-		// если партиции не существует, она создаётся
-		if err != nil {
-			err = a.repoResult.CreatePartition(ctx, partitionName, a.cfg.TableNameResult, start, end)
-			if err != nil {
-				a.log.Error(err.Error())
-				continue
-			}
-		}
+		// // если партиции не существует, она создаётся
+		// if err != nil {
+		// 	err = a.repoResult.CreatePartition(ctx, partitionName, a.cfg.TableNameResult, start, end)
+		// 	if err != nil {
+		// 		a.log.Error(err.Error())
+		// 		continue
+		// 	}
+		// }
 
 		// получений id нового цикла
 		id, err := a.repoGlobal.GetNewGlobalCycle(ctx, a.cfg.TableNameGlobal)
@@ -60,13 +58,15 @@ func (a *app) Run(ctx context.Context) {
 
 		// объекты, которые необходимо вставить за данный цикл
 		objs := []devicetestingresults.DeviceTestingResults{
-			{CycleId: id, StartDatetime: convertTime(time.Now()), Uuid: rand.Intn(1000)},
-			{CycleId: id, StartDatetime: convertTime(time.Now()), Uuid: rand.Intn(1000)},
-			{CycleId: id, StartDatetime: convertTime(time.Now()), Uuid: rand.Intn(1000)},
+			{CycleId: id, StartDatetime: methods.ConvertTime(time.Now()), Uuid: rand.Intn(1000)},
+			{CycleId: id, StartDatetime: methods.ConvertTime(time.Now()), Uuid: rand.Intn(1000)},
+			{CycleId: id, StartDatetime: methods.ConvertTime(time.Now()), Uuid: rand.Intn(1000)},
 		}
 
+		t := time.Now()
+
 		// вставка строки в таблицу с результатами
-		err = a.repoResult.Insert(ctx, a.cfg.TableNameResult, objs)
+		err = a.repoResult.Insert(ctx, a.cfg.TableNameResult, objs, t)
 		if err != nil {
 			a.log.Error(err.Error())
 			continue
