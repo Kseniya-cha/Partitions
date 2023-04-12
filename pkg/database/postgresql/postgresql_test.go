@@ -14,11 +14,11 @@ import (
 )
 
 func TestDatabaseConnection(t *testing.T) {
-	// задаем параметры подключения к базе данных
+	// задаем параметры подключения к базе данных (реальные)
 	conf, _ := pgxpool.ParseConfig("")
-	conf.ConnConfig.Database = "db"
-	conf.ConnConfig.User = "user"
-	conf.ConnConfig.Password = "pass"
+	conf.ConnConfig.Database = "firstbd"
+	conf.ConnConfig.User = "postgres"
+	conf.ConnConfig.Password = "password"
 	conf.ConnConfig.Host = "localhost"
 	conf.ConnConfig.Port = 5432
 	conf.MaxConns = 2
@@ -41,9 +41,9 @@ func TestDatabaseConnection(t *testing.T) {
 	}
 
 	cfg := config.Config{Database: config.Database{
-		DbName:   "db",
-		User:     "user",
-		Password: "pass",
+		DbName:   "firstbd",
+		User:     "postgres",
+		Password: "password",
 		Port:     5432,
 		Host:     "localhost",
 	}}
