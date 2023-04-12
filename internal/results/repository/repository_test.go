@@ -1,10 +1,15 @@
 package repository
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/Kseniya-cha/Partitions/pkg/database/postgresql"
 	"github.com/Kseniya-cha/Partitions/pkg/methods"
+	"github.com/golang/mock/gomock"
+	"go.uber.org/zap"
 )
 
 func Test_convertTime(t *testing.T) {
@@ -38,5 +43,24 @@ func Test_getPartitionName(t *testing.T) {
 
 	if got != expect {
 		t.Errorf("expect: %s, got: %s", expect, got)
+	}
+}
+
+func Test_NewRepository(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockDB := postgresql.NewMockIDB(ctrl)
+	mockDB.EXPECT().Close()
+	defer mockDB.Close()
+	mockLog := zap.NewNop()
+
+	repo := NewRepository(mockDB, mockLog)
+	repoS := strings.Split(fmt.Sprint(repo), " ")
+	testRepoS := strings.Split(fmt.Sprint(&repository{db: mockDB, log: mockLog}), " ")
+
+	for i := range repoS {
+		if repoS[i] != testRepoS[i] {
+			t.Errorf("Unexpected Repository struct: %v, expect %v", testRepoS, repoS)
+		}
 	}
 }
