@@ -1,11 +1,14 @@
 package repository
 
 import (
+	"context"
 	"fmt"
+	"math/rand"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/Kseniya-cha/Partitions/internal/results"
 	"github.com/Kseniya-cha/Partitions/pkg/database/postgresql"
 	"github.com/Kseniya-cha/Partitions/pkg/methods"
 	"github.com/golang/mock/gomock"
@@ -63,4 +66,34 @@ func Test_NewRepository(t *testing.T) {
 			t.Errorf("Unexpected Repository struct: %v, expect %v", testRepoS, repoS)
 		}
 	}
+}
+
+func Test_Insert(t *testing.T) {
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockDB := postgresql.NewMockIDB(ctrl)
+	mockDB.EXPECT().Close()
+	defer mockDB.Close()
+	mockLog := zap.NewNop()
+	mockCommon := results.NewMockCommon(ctrl)
+
+	repo := NewRepository(mockDB, mockLog)
+	repo.common = mockCommon
+
+	tnow := time.Now()
+	objsTest := []results.DeviceTestingResults{
+		{CycleId: 1, StartDatetime: methods.ConvertTime(tnow), Uuid: rand.Intn(1000)},
+	}
+
+	mockCommon.EXPECT().Insert(ctx, "results", objsTest, tnow)
+
+	t.Run("Insert_OK", func(t *testing.T) {
+		if err := repo.common.Insert(ctx, "results", objsTest, tnow); err != nil {
+			t.Error("unexpected error:", err)
+		}
+	})
 }

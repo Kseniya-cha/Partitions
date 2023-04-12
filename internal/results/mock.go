@@ -7,6 +7,7 @@ package results
 import (
 	context "context"
 	reflect "reflect"
+	"time"
 
 	gomock "github.com/golang/mock/gomock"
 )
@@ -49,17 +50,17 @@ func (mr *MockCommonMockRecorder) CreatePartition(ctx, partitionName, tableName,
 }
 
 // Insert mocks base method.
-func (m *MockCommon) Insert(ctx context.Context, tableName string, values DeviceTestingResults) error {
+func (m *MockCommon) Insert(ctx context.Context, tableNameResult string, objs []DeviceTestingResults, t time.Time) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Insert", ctx, tableName, values)
+	ret := m.ctrl.Call(m, "Insert", ctx, tableNameResult, objs, t)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Insert indicates an expected call of Insert.
-func (mr *MockCommonMockRecorder) Insert(ctx, tableName, values interface{}) *gomock.Call {
+func (mr *MockCommonMockRecorder) Insert(ctx, tableNameResult, objs, t interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Insert", reflect.TypeOf((*MockCommon)(nil).Insert), ctx, tableName, values)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Insert", reflect.TypeOf((*MockCommon)(nil).Insert), ctx, tableNameResult, objs, t)
 }
 
 // IsPartitionExist mocks base method.
