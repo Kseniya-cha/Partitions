@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Kseniya-cha/Partitions/internal/devicetestingresults"
+	"github.com/Kseniya-cha/Partitions/internal/results"
 	"github.com/Kseniya-cha/Partitions/pkg/database/postgresql"
 	"go.uber.org/zap"
 )
@@ -15,7 +15,7 @@ type repository struct {
 	db  postgresql.IDB
 	log *zap.Logger
 
-	common devicetestingresults.Common
+	common results.Common
 }
 
 func NewRepository(db postgresql.IDB, log *zap.Logger) *repository {
@@ -29,7 +29,7 @@ func NewRepository(db postgresql.IDB, log *zap.Logger) *repository {
 // существует ли партиция с переданным именем
 func (r *repository) IsPartitionExist(ctx context.Context, partitionName string) error {
 
-	query := fmt.Sprintf(devicetestingresults.SelectAll, partitionName)
+	query := fmt.Sprintf(results.SelectAll, partitionName)
 
 	if ctx.Err() != nil {
 		return ctx.Err()
@@ -53,7 +53,7 @@ func (r *repository) IsPartitionExist(ctx context.Context, partitionName string)
 func (r *repository) CreatePartition(ctx context.Context, partitionName, tableName,
 	start, end string) error {
 
-	query := fmt.Sprintf(devicetestingresults.CreatePartition, partitionName, tableName, start, end)
+	query := fmt.Sprintf(results.CreatePartition, partitionName, tableName, start, end)
 
 	if ctx.Err() != nil {
 		return ctx.Err()
@@ -73,7 +73,7 @@ func (r *repository) CreatePartition(ctx context.Context, partitionName, tableNa
 }
 
 func (r *repository) Insert(ctx context.Context, tableNameResult string,
-	objs []devicetestingresults.DeviceTestingResults, t time.Time) error {
+	objs []results.DeviceTestingResults, t time.Time) error {
 
 	// start, end - начало и конец границ партиций
 	start, end := getPeriodDays(t, 1)
@@ -93,6 +93,7 @@ func (r *repository) Insert(ctx context.Context, tableNameResult string,
 		}
 	}
 
+	// формирование строки запроса
 	query := r.getInsertQuery(objs, tableNameResult)
 
 	if ctx.Err() != nil {
@@ -112,7 +113,7 @@ func (r *repository) Insert(ctx context.Context, tableNameResult string,
 	return nil
 }
 
-func (r *repository) getInsertQuery(objs []devicetestingresults.DeviceTestingResults,
+func (r *repository) getInsertQuery(objs []results.DeviceTestingResults,
 	tableNameResult string) string {
 
 	val := strings.Builder{}
@@ -125,5 +126,5 @@ func (r *repository) getInsertQuery(objs []devicetestingresults.DeviceTestingRes
 		val.WriteString(fmt.Sprintf("('%d', '%d', '%s'), ", obj.CycleId, obj.Uuid, obj.StartDatetime))
 	}
 
-	return fmt.Sprintf(devicetestingresults.Insert, tableNameResult, val.String()[:val.Len()-2])
+	return fmt.Sprintf(results.Insert, tableNameResult, val.String()[:val.Len()-2])
 }

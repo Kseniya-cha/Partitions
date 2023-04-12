@@ -1,4 +1,4 @@
-package devicetestingresults
+package results
 
 const (
 	SelectAll = `SELECT * FROM %s`

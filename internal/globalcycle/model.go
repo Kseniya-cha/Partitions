@@ -1,4 +1,4 @@
-package monitoringcycle
+package globalcycle
 
 import "time"
 

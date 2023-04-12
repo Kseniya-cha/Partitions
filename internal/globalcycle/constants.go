@@ -1,4 +1,4 @@
-package monitoringcycle
+package globalcycle
 
 const (
 	InsertGlobal      = `INSERT INTO %s (start_datetime) VALUES (now())`

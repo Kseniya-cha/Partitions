@@ -1,4 +1,4 @@
-package devicetestingresults
+package results
 
 import (
 	"context"

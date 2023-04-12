@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Kseniya-cha/Partitions/internal/monitoringcycle"
+	"github.com/Kseniya-cha/Partitions/internal/globalcycle"
 	"github.com/Kseniya-cha/Partitions/pkg/database/postgresql"
 	"go.uber.org/zap"
 )
@@ -13,7 +13,7 @@ type repository struct {
 	db  postgresql.IDB
 	log *zap.Logger
 
-	common monitoringcycle.Common
+	common globalcycle.Common
 }
 
 func NewRepository(db postgresql.IDB, log *zap.Logger) *repository {
@@ -25,7 +25,7 @@ func NewRepository(db postgresql.IDB, log *zap.Logger) *repository {
 
 func (r *repository) InsertGlobal(ctx context.Context, tableName string) error {
 
-	query := fmt.Sprintf(monitoringcycle.InsertGlobal, tableName)
+	query := fmt.Sprintf(globalcycle.InsertGlobal, tableName)
 
 	if ctx.Err() != nil {
 		return ctx.Err()
@@ -47,7 +47,7 @@ func (r *repository) InsertGlobal(ctx context.Context, tableName string) error {
 // GetNewGlobalCycle возвращает последний id из таблицы tableName
 func (r *repository) GetNewGlobalCycle(ctx context.Context, tableName string) (int, error) {
 
-	query := fmt.Sprintf(monitoringcycle.GetNewGlobalCycle, tableName)
+	query := fmt.Sprintf(globalcycle.GetNewGlobalCycle, tableName)
 
 	if ctx.Err() != nil {
 		return 0, ctx.Err()
@@ -77,7 +77,7 @@ func (r *repository) GetNewGlobalCycle(ctx context.Context, tableName string) (i
 }
 
 func (r *repository) Update(ctx context.Context, tableName string, id int) error {
-	query := fmt.Sprintf(monitoringcycle.Update, tableName, id)
+	query := fmt.Sprintf(globalcycle.Update, tableName, id)
 
 	if ctx.Err() != nil {
 		return ctx.Err()

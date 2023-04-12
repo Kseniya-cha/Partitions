@@ -1,4 +1,4 @@
-package devicetestingresults
+package results
 
 type DeviceTestingResults struct {
 	Id            int    `json: "id"`

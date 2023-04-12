@@ -4,10 +4,10 @@ import (
 	"context"
 	"os"
 
-	"github.com/Kseniya-cha/Partitions/internal/devicetestingresults"
-	repoRes "github.com/Kseniya-cha/Partitions/internal/devicetestingresults/repository"
-	"github.com/Kseniya-cha/Partitions/internal/monitoringcycle"
-	repoGlob "github.com/Kseniya-cha/Partitions/internal/monitoringcycle/repository"
+	"github.com/Kseniya-cha/Partitions/internal/globalcycle"
+	repoGlob "github.com/Kseniya-cha/Partitions/internal/globalcycle/repository"
+	"github.com/Kseniya-cha/Partitions/internal/results"
+	repoRes "github.com/Kseniya-cha/Partitions/internal/results/repository"
 	"github.com/Kseniya-cha/Partitions/pkg/config"
 	"github.com/Kseniya-cha/Partitions/pkg/database/postgresql"
 	"github.com/Kseniya-cha/Partitions/pkg/logger"
@@ -27,8 +27,8 @@ type app struct {
 
 	sigChan chan os.Signal
 
-	repoGlobal monitoringcycle.Repository
-	repoResult devicetestingresults.Repository
+	repoGlobal globalcycle.Repository
+	repoResult results.Repository
 }
 
 // NewApp инициализирует прототип приложения
