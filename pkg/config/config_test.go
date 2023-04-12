@@ -2,10 +2,8 @@ package config
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"reflect"
-	"strings"
 	"testing"
 )
 
@@ -80,14 +78,13 @@ logger:
 
 			if err != nil && tt.expectErr == nil {
 				t.Errorf("unexpected error %v, expect nil", err)
-
 			} else if err != nil && tt.expectErr != nil {
-
-				gotErr := strings.Split(fmt.Sprintf("%v", err), "err: ")[1]
-				expErr := fmt.Sprintf("%v", tt.expectErr)
-				if gotErr != expErr {
-					t.Errorf("unexpected error %v,\nexpect %v", gotErr, expErr)
+				if err.Error() != tt.expectErr.Error() {
+					t.Errorf("unexpected error %v,\nexpect %v", err, tt.expectErr)
 				}
+			}
+			if err != nil {
+				return
 			}
 
 			if !reflect.DeepEqual(cfg, tt.expectCfg) {
