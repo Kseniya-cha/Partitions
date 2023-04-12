@@ -24,6 +24,7 @@ func NewRepository(db postgresql.IDB, log *zap.Logger) *repository {
 }
 
 func (r *repository) InsertGlobal(ctx context.Context, tableName string) error {
+
 	query := fmt.Sprintf(monitoringcycle.InsertGlobal, tableName)
 
 	if ctx.Err() != nil {

@@ -16,10 +16,10 @@ import (
 func TestDatabaseConnection(t *testing.T) {
 	// задаем параметры подключения к базе данных
 	conf, _ := pgxpool.ParseConfig("")
-	conf.ConnConfig.Database = "l3"
-	conf.ConnConfig.User = "sysadmin"
-	conf.ConnConfig.Password = "w3X{77PpCR"
-	conf.ConnConfig.Host = "192.168.0.32"
+	conf.ConnConfig.Database = "db"
+	conf.ConnConfig.User = "user"
+	conf.ConnConfig.Password = "pass"
+	conf.ConnConfig.Host = "localhost"
 	conf.ConnConfig.Port = 5432
 	conf.MaxConns = 2
 
@@ -31,7 +31,7 @@ func TestDatabaseConnection(t *testing.T) {
 	// делаем запрос к базе данных
 	conn, err := pool.Acquire(context.Background())
 	if err != nil {
-		t.Errorf("error acquiring connection from pool: %s", err)
+		t.Error("error acquiring connection from pool:", err)
 	}
 	defer conn.Release()
 

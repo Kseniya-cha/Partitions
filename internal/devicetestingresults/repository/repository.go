@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/Kseniya-cha/Partitions/internal/devicetestingresults"
 	"github.com/Kseniya-cha/Partitions/pkg/database/postgresql"
@@ -71,7 +72,26 @@ func (r *repository) CreatePartition(ctx context.Context, partitionName, tableNa
 	return nil
 }
 
-func (r *repository) Insert(ctx context.Context, tableNameResult string, objs []devicetestingresults.DeviceTestingResults) error {
+func (r *repository) Insert(ctx context.Context, tableNameResult string,
+	objs []devicetestingresults.DeviceTestingResults, t time.Time) error {
+
+	// start, end - начало и конец границ партиций
+	start, end := getPeriodDays(t, 1)
+
+	// имя партиции
+	partitionName := getPartitionName(tableNameResult, start, end, false)
+
+	// проверка, что партиция существует
+	err := r.IsPartitionExist(ctx, partitionName)
+
+	// если партиции не существует, она создаётся
+	if err != nil {
+		err = r.CreatePartition(ctx, partitionName, tableNameResult, start, end)
+		if err != nil {
+			r.log.Error(err.Error())
+			return err
+		}
+	}
 
 	query := r.getInsertQuery(objs, tableNameResult)
 

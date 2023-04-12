@@ -32,8 +32,8 @@ database:
   password: mypass`,
 			expectCfg: &Config{
 				Logger: Logger{
-					LogLevel:   "DEBUG",
-					LogFile:    "./out.log",
+					LogLevel: "DEBUG",
+					// LogFile:    "./out.log",
 					RewriteLog: true,
 				},
 				Database: Database{
