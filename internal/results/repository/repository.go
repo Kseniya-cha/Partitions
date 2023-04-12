@@ -79,7 +79,7 @@ func (r *repository) Insert(ctx context.Context, tableNameResult string,
 	start, end := getPeriodDays(t, 1)
 
 	// имя партиции
-	partitionName := getPartitionName(tableNameResult, start, end, false)
+	partitionName := getPartitionName(tableNameResult, start)
 
 	// проверка, что партиция существует
 	err := r.IsPartitionExist(ctx, partitionName)
