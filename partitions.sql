@@ -1,10 +1,10 @@
-CREATE TABLE "monitoring_cycles" (
+CREATE TABLE global_cycles (
   id bigserial PRIMARY KEY,
   start_datetime timestamp NOT NULL DEFAULT (now()),
   end_datetime timestamp
 );
 
-CREATE TABLE "device_testing_results" (
+CREATE TABLE results (
   id bigserial,
   cycles_id int NOT NULL,
   uuid int NOT NULL,
@@ -12,8 +12,8 @@ CREATE TABLE "device_testing_results" (
 	PRIMARY KEY (id, start_datetime)
 ) PARTITION BY RANGE (start_datetime);
 
-CREATE INDEX ON monitoring_cycles (start_datetime);
+CREATE INDEX ON global_cycles (start_datetime);
 
-CREATE INDEX ON device_testing_results (cycles_id);
+CREATE INDEX ON results (cycles_id);
 
-ALTER TABLE device_testing_results ADD FOREIGN KEY (cycles_id) REFERENCES monitoring_cycles (id);
+ALTER TABLE results ADD FOREIGN KEY (cycles_id) REFERENCES global_cycles (id);
