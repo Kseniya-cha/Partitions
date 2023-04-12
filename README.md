@@ -39,5 +39,53 @@ database:
 
 ## Алгоритм
 
+1. В таблицу `global_cycles` добавляется информация о начале нового цикла работы программы: добавляется время начала работы в поле `start_datetime`:
 
+``` SQL
+INSERT INTO start_datetime (start_datetime) VALUES (now())
+```
 
+2. Извлекается `id` начатого цикла:
+
+``` SQL
+SELECT id FROM global_cycles ORDER BY "id" DESC LIMIT 1
+```
+
+3. Задаётся время старта для обработки объектов.
+
+4. Генерируется рандомное число объектов, которые будут добавлены в таблицу `results`; они содержат информацию о времени начала их обработки, id цикла и уникальный uuid (случайное число до 1000).
+
+5. Перед выполнением `INSERT` запроса в таблицу `results` выполняется проверка, существует ли партиция для данного `start_datetime` в таблице `results`: 
+
+``` SQL
+SELECT * FROM partition_name
+```
+
+где параметр `partition_name` определяется на основе зафиксированного ранее времени начала обработки объектов.
+
+Если нужной партиции нет, она создаётся:
+
+``` SQL
+CREATE TABLE partition_name PARTITION OF results
+	FOR VALUES FROM ('start_datetime') TO ('end_datetime')
+```
+
+где параметры `start_datetime` и `end_datetime` определяются на основе зафиксированного ранее времени.
+
+6. Формируется строка одного `INSERT` запроса в таблицу `results` на основе данных об объектах.
+
+7. В таблицу `results` добавляется информация:
+
+``` SQL
+INSERT INTO results (cycles_id, uuid, start_datetime) VALUES vals
+```
+
+где `vals` - сформированная в п.6 строка.
+
+8. Выполняется `UPDATE` запрос в таблицу `global_cycles`, в котором обновляется время завершения работы цикла:
+
+``` SQL
+UPDATE global_cycles SET end_datetime=now() WHERE id=ID
+```
+
+где `ID` - id данного цикла, полученного в п.2.

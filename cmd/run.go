@@ -40,18 +40,16 @@ func (a *app) Run(ctx context.Context) {
 
 		t := time.Now()
 
-		// объекты, которые необходимо вставить за данный цикл
-		objs := []results.DeviceTestingResults{
-			{CycleId: id, StartDatetime: methods.ConvertTime(t), Uuid: rand.Intn(1000)},
-			{CycleId: id, StartDatetime: methods.ConvertTime(t), Uuid: rand.Intn(1000)},
-			{CycleId: id, StartDatetime: methods.ConvertTime(t), Uuid: rand.Intn(1000)},
+		// рандомное число объектов, которые необходимо вставить за данный цикл
+		objs := []results.DeviceTestingResults{}
+		for i := 0; i < rand.Intn(5); i++ {
+			objs = append(objs, results.DeviceTestingResults{CycleId: id, StartDatetime: methods.ConvertTime(t), Uuid: rand.Intn(1000)})
 		}
 
 		// вставка строки в таблицу с результатами
 		err = a.repoResult.Insert(ctx, a.cfg.TableNameResult, objs, t)
 		if err != nil {
 			a.log.Error(err.Error())
-			continue
 		}
 
 		// вставка конечного времени обработки цикла
